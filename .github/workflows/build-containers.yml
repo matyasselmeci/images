@@ -81,11 +81,16 @@ jobs:
         yum_repo: ['development', 'testing', 'release']
         osg_series: ['3.5', '3.6']
     steps:
-      - uses: opensciencegrid/build-container-action@v0.3.0
+      - uses: Wandalen/wretry.action@v1.0.11
         with:
-          osg_series: ${{ matrix.osg_series }}
-          repo: ${{ matrix.yum_repo }}
-          context: ${{ matrix.image }}
+          action: opensciencegrid/build-container-action@v0.3.0
+          with: |
+            osg_series: ${{ matrix.osg_series }}
+            repo: ${{ matrix.yum_repo }}
+            context: ${{ matrix.image }}
+          attempt_limit: 3
+          attempt_delay: 10000
+          # ^^ 10 sec
 
   push:
     runs-on: ubuntu-latest
@@ -109,11 +114,16 @@ jobs:
             username: DOCKER_USERNAME
             password: DOCKER_PASSWORD
     steps:
-      - uses: opensciencegrid/push-container-action@v0.5.0
+      - uses: Wandalen/wretry.action@v1.0.11
         with:
-          repo: ${{ matrix.yum_repo}}
-          osg_series: ${{ matrix.osg_series }}
-          context: ${{ matrix.image }}
-          registry_url: ${{ matrix.registry.url }}
-          registry_user: ${{ secrets[matrix.registry.username] }}
-          registry_pass: ${{ secrets[matrix.registry.password] }}
+          action: opensciencegrid/push-container-action@v0.5.0
+          with: |
+            repo: ${{ matrix.yum_repo}}
+            osg_series: ${{ matrix.osg_series }}
+            context: ${{ matrix.image }}
+            registry_url: ${{ matrix.registry.url }}
+            registry_user: ${{ secrets[matrix.registry.username] }}
+            registry_pass: ${{ secrets[matrix.registry.password] }}
+          attempt_limit: 3
+          attempt_delay: 100000
+          # ^^ 100 sec
