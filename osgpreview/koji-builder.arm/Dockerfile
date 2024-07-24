@@ -20,6 +20,8 @@ RUN touch /var/log/kojid.log
 COPY --chmod=0755 healthcheck /sbin/healthcheck
 COPY --chmod=0755 cleanup /etc/cron.hourly
 
+HEALTHCHECK --start-period=30s CMD /sbin/healthcheck
+
 # Required environment variables
 # ------------------------------
 # The hostname of the koji-hub XMLRPC server
